@@ -214,12 +214,11 @@ class TBCA:
                 # Realizar un corrimiento de 1 byte hacia la izquierda
                 msgCorridoToLeft = self.correrByteIzquierda(xorMsgTransAndK1)
                 self.bloques[j] = msgCorridoToLeft
+        cipherText = ""
+        for i in range (len(self.bloques)):
+            cipherText += self.listaToString(self.bloques[i])
+        return cipherText
 
-        print(self.bloques)
-
-
+'''Ejemplo de uso'''
 tbca = TBCA()
-
-IV = tbca.generarIV()
-
-tbca.cifrar("Hola", "clave1234")
+print(tbca.cifrar("Hola", "clave1234"))
