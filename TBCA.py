@@ -85,6 +85,7 @@ class TBCA:
     def __init__(self):
         self.bloques = []
         self.claves = []
+        self.cipherText = ""
 
     def generarIV(self):
         IV_hex = secrets.token_hex(4)
@@ -168,14 +169,17 @@ class TBCA:
 
         texto = ""
         for elemento in listaHex:
-            texto += elemento
+            if (len(elemento) == 1):
+                texto += '0'+elemento
+            else:
+                texto += elemento
 
         return texto
 
-    def cifrar(self, mensaje, clave):
+    def cifrar(self, mensaje, clave, IV):
 
         #Se genera un hexadecimal de 4 Bytes random que será nuestro Vector de Inicialización
-        self.IV = self.generarIV()
+        self.IV = IV
 
         #Pasar el mensaje de texto claro a base64 y luego dividirlo en bloques de tamaño 4
         mensajeB64 = self.textToBase64(mensaje)
@@ -184,41 +188,72 @@ class TBCA:
         #Pasar la clave de texto claro a base64 y luego obtener 10 claves que se utilizarán en las 10 iteraciones
         claveB64 = self.textToBase64(clave)
         self.claves = self.generarClaves(claveB64)
-        #Pasar el bloque 1 del mensaje a hexadecimal
-        mensajeHex = self.textToHex(self.bloques[0])
 
         #Ciclo para realizar las 10 iteraciones con todos los bloques del mensaje
-        for i in range (0, 1, 1):
-            # Aplicar XOR con el el IV
-            xorMensajeAndIV = self.calcularXOR(mensajeHex, self.IV)
 
-            # Realizar la transposición del bloque.
-            mensajeHexTranspuesto = self.transponerByte(xorMensajeAndIV)
-            # Aplicar XOR del mensaje transpuesto con la clave generada K1.
-            xorMsgTransAndK1 = self.calcularXOR(mensajeHexTranspuesto, self.textToHex(self.claves[i]))
-            # Realizar un corrimiento de 1 byte hacia la izquierda
-            msgCorridoToLeft = self.correrByteIzquierda(xorMsgTransAndK1)
-            #Guardar el resultado en la lista de bloques
-            self.bloques[0] = msgCorridoToLeft
+        for clave in self.claves:
+            for i in range (0, len(self.bloques), 1):
 
-            for j in range (1, len(self.bloques), 1):
-                # Pasar el bloque 1 del mensaje a hexadecimal y aplicar XOR con el el IV
+                # Pasar el bloque 1 del mensaje a hexadecimal
+                if  (clave == self.claves[0]):
+                    mensajeHex = self.textToHex(self.bloques[i])
 
-                mensajeHex = self.textToHex(self.bloques[j])
-                xorMensajeAndIV = self.calcularXOR(mensajeHex, self.listaToString(self.bloques[j-1]))
+                #print("i: ", mensajeHex)
+
+                # Aplicar XOR con el el IV
+                if (i == 0):
+                    xorMensajeAndIV = self.calcularXOR(mensajeHex, self.IV)
+                else:
+                    xorMensajeAndIV = self.calcularXOR(mensajeHex, self.bloques[i-1])
 
                 # Realizar la transposición del bloque.
                 mensajeHexTranspuesto = self.transponerByte(xorMensajeAndIV)
+
                 # Aplicar XOR del mensaje transpuesto con la clave generada K1.
-                xorMsgTransAndK1 = self.calcularXOR(mensajeHexTranspuesto, self.textToHex(self.claves[j]))
+                xorMsgTransAndKi = self.calcularXOR(mensajeHexTranspuesto, self.textToHex(clave))
                 # Realizar un corrimiento de 1 byte hacia la izquierda
-                msgCorridoToLeft = self.correrByteIzquierda(xorMsgTransAndK1)
-                self.bloques[j] = msgCorridoToLeft
-        cipherText = ""
-        for i in range (len(self.bloques)):
-            cipherText += self.listaToString(self.bloques[i])
-        return cipherText
+                msgShiftLeft = self.correrByteIzquierda(xorMsgTransAndKi)
+                #Guardar el resultado en la lista de bloques
+                self.bloques[i] = self.listaToString(msgShiftLeft)
+
+        self.cipherText = self.listaToString(self.bloques)
+
+        return self.cipherText
+
+    def correrByteDerecha(self, cadenaHex):
+        temp = cadenaHex[-1]
+        for i in range(len(cadenaHex)-1, 0, -1):
+            cadenaHex[i] = cadenaHex[i-1]
+        cadenaHex[0] = temp
+        return cadenaHex
+
+    def invTransponerByte(self, listaBloque):
+
+        bytesPares = []
+        bytesImpares = []
+
+        for hexa in listaBloque:
+            if (listaBloque.index(hexa) % 2 == 0):
+                bytesPares.append(hexa)
+            else:
+                bytesImpares.append(hexa)
+
+        print(bytesPares + bytesImpares)
+
+
+    def descifrar(self):
+        shiftBytesRight = self.correrByteDerecha(["64", "1a", "2e", "f1"])
+        print(self.invTransponerByte(shiftBytesRight))
+    # def descifrar(self, cipherText, clave, IV):
+    #
+    #     self.cipherText = cipherText
+    #     claveB64 = self.textToBase64(clave)
+    #     self.claves = self.generarClaves(claveB64)
+    #     self.IV = IV
 
 '''Ejemplo de uso'''
 tbca = TBCA()
-print(tbca.cifrar("Hola", "clave1234"))
+IV = tbca.generarIV()
+print(tbca.cifrar("Hola", "clave1234", IV))
+
+print(tbca.descifrar())
