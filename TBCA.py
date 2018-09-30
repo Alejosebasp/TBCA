@@ -2,6 +2,7 @@
 
 import base64
 import secrets
+import codecs
 
 
 class TBCA:
@@ -130,10 +131,8 @@ class TBCA:
         #Pasar la clave de texto claro a base64 y luego obtener 10 claves que se utilizarán en las 10 iteraciones
         claveB64 = self.textToBase64(clave)
         self.claves = self.generarClaves(claveB64)
-        print("Claves en b64: ", self.claves)
-        print("Bloques: ", self.bloques)
+
         #Ciclo para realizar las 10 iteraciones con todos los bloques del mensaje
-        print("IV: ", self.IV)
         for clave in self.claves:
             for i in range (0, len(self.bloques), 1):
 
@@ -152,14 +151,13 @@ class TBCA:
                 mensajeHexTranspuesto = self.transponerByte(xorMensajeAndIV)
                 # Aplicar XOR del mensaje transpuesto con la clave generada K1.
                 claveHexa = self.textToHex(clave)
-                print("Clave hexa: ", claveHexa)
                 xorMsgTransAndKi = self.calcularXOR(mensajeHexTranspuesto, claveHexa)
                 # Realizar un corrimiento de 1 byte hacia la izquierda
                 msgShiftLeft = self.correrByteIzquierda(xorMsgTransAndKi)
                 #Guardar el resultado en la lista de bloques
                 self.bloques[i] = self.listaToString(msgShiftLeft)
-                print("Bloques: ", self.bloques)
 
+        #self.bloques = self.hexToB64()
         self.cipherText = self.listaToString(self.bloques)
 
         return self.cipherText
@@ -202,9 +200,15 @@ class TBCA:
 
         for hexa in listaBloque:
             if (listaBloque.index(hexa) % 2 == 0):
-                bytesPares.append(hexa)
+                if len(hexa) == 1:
+                    bytesPares.append("0"+hexa)
+                else:
+                    bytesPares.append(hexa)
             else:
-                bytesImpares.append(hexa)
+                if len(hexa) == 1:
+                    bytesImpares.append("0"+hexa)
+                else:
+                    bytesImpares.append(hexa)
 
         hexa2 = ""
         for hexa in bytesPares:
@@ -227,21 +231,29 @@ class TBCA:
     def hexToText(self, cadenaHex):
         return (bytes.fromhex(cadenaHex).decode('ISO-8859-1'))
 
+    def hexToB64(self, stringHexa):
+        textB64 = codecs.encode(codecs.decode(stringHexa, "hex"), "base64").decode()
+        print(textB64)
+
+    def ultimaTranslacion(self, listaBloques):
+        listaAux = []
+        for bloque in listaBloques:
+            lista = self.stringToList(bloque)
+            temp = lista[2]
+            lista[2] = lista[1]
+            lista[1] = temp
+            listaAux.append(self.listaToString(lista))
+        return listaAux
 
     def descifrar(self, cipherTextInHexa, clave, IV):
         #Pasar el string a una lista de bytes hexadecimales y crear los bloques para descifrar
         self.bloquesCipherText = self.crearBloquesParaDescifrar(cipherTextInHexa)
         self.IV = IV
-        print("IV: ", self.IV)
 
         # Pasar la clave de texto claro a base64 y luego obtener 10 claves que se utilizarán en las 10 iteraciones
         claveB64 = self.textToBase64(clave)
         #self.claves = self.generarClaves(claveB64)
         self.claves.reverse()
-
-        print("Claves inversas: ", self.claves)
-
-        print("Bloques para decifrar: ", self.bloquesCipherText)
 
         for clave in self.claves:
             for i in range(len(self.bloquesCipherText)):
@@ -250,22 +262,25 @@ class TBCA:
                 shiftBytesRight = self.correrByteDerecha(self.stringToList(self.bloquesCipherText[i]))
                 # Aplicar el XOR del cipher Text con la clave para
                 claveEnHexa = self.textToHex(clave)
-                print("Clave en Hexa: ", claveEnHexa)
+
                 xorShiftBytesRightAndKi = self.calcularXOR(shiftBytesRight, claveEnHexa)
 
                 # Aplicar la función inversa de TransponerByte
                 cipherTextTranspuesto = self.invTransponerByte(xorShiftBytesRightAndKi)
-
+                print(self.IV)
                 if (i == len(self.bloquesCipherText) - 1):
                     xorTextTranspuestoAndIV = self.calcularXOR(cipherTextTranspuesto, self.IV)
                 else:
                     xorTextTranspuestoAndIV = self.calcularXOR(cipherTextTranspuesto, self.bloquesCipherText[i+1])
 
                 self.bloquesCipherText[i] = self.listaToString(xorTextTranspuestoAndIV)
-                print("Bloques para decifrar: ", self.bloquesCipherText)
 
+        self.bloquesCipherText.reverse()
 
-        return self.mensajeDescifrado
+        self.bloquesCipherText = self.ultimaTranslacion(self.bloquesCipherText)
+        self.hexToB64(self.listaToString(self.bloquesCipherText))
+
+        return self.bloquesCipherText
 
 
 '''Ejemplo de uso'''
