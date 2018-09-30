@@ -37,6 +37,10 @@ class TBCA:
 
         return mensajeB64.decode("utf-8")
 
+    def base64ToText(self, cadenaB64):
+        mensaje = str(base64.b64decode(cadenaB64))
+        return mensaje[2:len(mensaje)-1]
+
     def calcularXOR(self, stringHex1, stringHex2):
 
         resultado = []
@@ -233,7 +237,7 @@ class TBCA:
 
     def hexToB64(self, stringHexa):
         textB64 = codecs.encode(codecs.decode(stringHexa, "hex"), "base64").decode()
-        print(textB64)
+        return textB64
 
     def ultimaTranslacion(self, listaBloques):
         listaAux = []
@@ -278,9 +282,8 @@ class TBCA:
         self.bloquesCipherText.reverse()
 
         self.bloquesCipherText = self.ultimaTranslacion(self.bloquesCipherText)
-        #self.hexToB64(self.listaToString(self.bloquesCipherText))
 
-        return self.listaToString(self.bloquesCipherText)
+        return self.base64ToText(self.hexToText(self.listaToString(self.bloquesCipherText)))
 
 
 '''Ejemplo de uso'''
@@ -297,10 +300,18 @@ IV = tbca.generarIV()
 cipherText = tbca.cifrar(mensaje, clave, IV)
 #Se imprime el cipher Text
 print("Cifrado: ", cipherText)
-#Para descifrar, llamar a la función descifrar del objeto
-#Se obtiene el mensaje descifrado, en hexadecimal (se debe pasar a Base64 y luego a ASCII)
+#Para descifrar, llamar a la función descifrar del objeto,
+#se debe pasar el cipher text como un string de hexadecimales.
+#Se obtiene el mensaje descifrado, en ASCII
 mensajedescifrado = tbca.descifrar(cipherText, clave, IV)
 #Se imprime el mendaje descifrado
 print("descifrado: ", mensajedescifrado)
 
 
+'''Valores del IV que cambian el resultado:
+446cabef
+21bff28d
+7fea2bc5
+fda55311
+04bd90b3
+'''
