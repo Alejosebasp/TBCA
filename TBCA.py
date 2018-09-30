@@ -267,7 +267,7 @@ class TBCA:
 
                 # Aplicar la función inversa de TransponerByte
                 cipherTextTranspuesto = self.invTransponerByte(xorShiftBytesRightAndKi)
-                print(self.IV)
+
                 if (i == len(self.bloquesCipherText) - 1):
                     xorTextTranspuestoAndIV = self.calcularXOR(cipherTextTranspuesto, self.IV)
                 else:
@@ -278,18 +278,29 @@ class TBCA:
         self.bloquesCipherText.reverse()
 
         self.bloquesCipherText = self.ultimaTranslacion(self.bloquesCipherText)
-        self.hexToB64(self.listaToString(self.bloquesCipherText))
+        #self.hexToB64(self.listaToString(self.bloquesCipherText))
 
-        return self.bloquesCipherText
+        return self.listaToString(self.bloquesCipherText)
 
 
 '''Ejemplo de uso'''
+#Instanciar el objeto para poder cifrar el mensaje
 tbca = TBCA()
+#Mensaje a cifrar
 mensaje = "Hola"
+#Clave para cifrar el mensaje
 clave = "clave1234"
+#Generar un Vector de Inicialización random, para aumentar la entropía (támbien se utiliza para descifrar)
 IV = tbca.generarIV()
+#Se llama a la función cifrar para poder cifrar el mensaje.
+# Se obtiene el cipher Text en hexadecimal (Habría que pasarlo a codigo ASCII)
 cipherText = tbca.cifrar(mensaje, clave, IV)
+#Se imprime el cipher Text
 print("Cifrado: ", cipherText)
-
+#Para descifrar, llamar a la función descifrar del objeto
+#Se obtiene el mensaje descifrado, en hexadecimal (se debe pasar a Base64 y luego a ASCII)
 mensajedescifrado = tbca.descifrar(cipherText, clave, IV)
-print("decifrado: ", mensajedescifrado)
+#Se imprime el mendaje descifrado
+print("descifrado: ", mensajedescifrado)
+
+
