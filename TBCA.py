@@ -117,10 +117,10 @@ class TBCA:
             lista.append(cadenaEnHexa[i:i+2])
         return lista
 
-    def cifrar(self, mensaje, clave):
+    def cifrar(self, mensaje, clave, IV):
 
         #Se genera un hexadecimal de 4 Bytes random que será nuestro Vector de Inicialización
-        self.IV = self.generarIV()
+        self.IV = IV
 
         #Pasar el mensaje de texto claro a base64 y luego dividirlo en bloques de tamaño 4
         mensajeB64 = self.textToBase64(mensaje)
@@ -228,10 +228,10 @@ class TBCA:
         return (bytes.fromhex(cadenaHex).decode('ISO-8859-1'))
 
 
-    def descifrar(self, cipherTextInHexa, clave):
+    def descifrar(self, cipherTextInHexa, clave, IV):
         #Pasar el string a una lista de bytes hexadecimales y crear los bloques para descifrar
         self.bloquesCipherText = self.crearBloquesParaDescifrar(cipherTextInHexa)
-
+        self.IV = IV
         print("IV: ", self.IV)
 
         # Pasar la clave de texto claro a base64 y luego obtener 10 claves que se utilizarán en las 10 iteraciones
@@ -272,9 +272,9 @@ class TBCA:
 tbca = TBCA()
 mensaje = "Hola"
 clave = "clave1234"
-#IV = tbca.generarIV()
-cipherText = tbca.cifrar(mensaje, clave)
+IV = tbca.generarIV()
+cipherText = tbca.cifrar(mensaje, clave, IV)
 print("Cifrado: ", cipherText)
 
-mensajedescifrado = tbca.descifrar(cipherText, clave)
+mensajedescifrado = tbca.descifrar(cipherText, clave, IV)
 print("decifrado: ", mensajedescifrado)
