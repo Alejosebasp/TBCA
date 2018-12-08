@@ -24,6 +24,7 @@ class TBCA:
 
     def generarIV(self):
         IV_hex = secrets.token_hex(4)
+        print(IV_hex)
         return IV_hex
 
     def textToHex(self, mensaje):
@@ -38,7 +39,9 @@ class TBCA:
         return mensajeB64.decode("utf-8")
 
     def base64ToText(self, cadenaB64):
+        print("B64: ", cadenaB64)
         mensaje = str(base64.b64decode(cadenaB64))
+        print("Text: ", mensaje)
         return mensaje[2:len(mensaje)-1]
 
     def calcularXOR(self, stringHex1, stringHex2):
@@ -46,7 +49,11 @@ class TBCA:
         resultado = []
         for i in range(0, self.sizeBloque * 2, 2):
             xor = int(hex(int(stringHex1[i:i + 2], 16)), 16) ^ int(hex(int(stringHex2[i:i + 2], 16)), 16)
-            resultado.append(str(hex(xor))[2:])
+
+            if (xor <= 15):
+                resultado.append('0' + str(hex(xor))[2:])
+            else:
+                resultado.append(str(hex(xor))[2:])
 
         return resultado
 
@@ -123,6 +130,7 @@ class TBCA:
         return lista
 
     def cifrar(self, mensaje, clave, IV):
+
 
         #Se genera un hexadecimal de 4 Bytes random que será nuestro Vector de Inicialización
         self.IV = IV
@@ -256,7 +264,7 @@ class TBCA:
 
         # Pasar la clave de texto claro a base64 y luego obtener 10 claves que se utilizarán en las 10 iteraciones
         claveB64 = self.textToBase64(clave)
-        #self.claves = self.generarClaves(claveB64)
+        self.claves = self.generarClaves(claveB64)
         self.claves.reverse()
 
         for clave in self.claves:
@@ -290,10 +298,11 @@ class TBCA:
 #Instanciar el objeto para poder cifrar el mensaje
 tbca = TBCA()
 #Mensaje a cifrar
-mensaje = "Hola"
+mensaje = "hola"
 #Clave para cifrar el mensaje
 clave = "clave1234"
 #Generar un Vector de Inicialización random, para aumentar la entropía (támbien se utiliza para descifrar)
+#IV = tbca.generarIV()
 IV = tbca.generarIV()
 #Se llama a la función cifrar para poder cifrar el mensaje.
 # Se obtiene el cipher Text en hexadecimal (Habría que pasarlo a codigo ASCII)
@@ -306,7 +315,6 @@ print("Cifrado: ", cipherText)
 mensajedescifrado = tbca.descifrar(cipherText, clave, IV)
 #Se imprime el mendaje descifrado
 print("descifrado: ", mensajedescifrado)
-
 
 '''Valores del IV que cambian el resultado:
 446cabef
