@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d6013840-592a-44b6-ade4-a15ad12b8896" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/TheBestCipherAlgorithm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TheBestCipherAlgorithm.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TBCA.py" beforeDir="false" afterPath="$PROJECT_DIR$/TBCA.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,15 +12,15 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/TheBestCipherAlgorithm$TBCA.coverage" NAME="TBCA Coverage Results" MODIFIED="1544230774759" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/TBCA$TBCA.coverage" NAME="TBCA Coverage Results" MODIFIED="1549855103305" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TBCA$TBCA.coverage" NAME="TBCA Coverage Results" MODIFIED="1549857046373" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/TBCA.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
-              <caret line="313" column="28" selection-start-line="313" selection-start-column="28" selection-end-line="313" selection-end-column="28" />
+            <state relative-caret-position="520">
+              <caret line="321" selection-start-line="321" selection-end-line="321" />
               <folding>
                 <element signature="e#55#68#0" expanded="true" />
                 <element signature="e#116#280#1" />
@@ -136,12 +133,20 @@
       <workItem from="1544215744209" duration="255000" />
       <workItem from="1544216410097" duration="3050000" />
       <workItem from="1544227446621" duration="3110000" />
-      <workItem from="1549825690758" duration="16860000" />
+      <workItem from="1549825690758" duration="18197000" />
     </task>
+    <task id="LOCAL-00001" summary="problema de descifrado solucionado.">
+      <created>1549855191399</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1549855191399</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23275000" />
+    <option name="totallyTimeSpent" value="24612000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
@@ -157,7 +162,7 @@
       <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="5" />
       <window_info anchor="bottom" id="Docker" order="6" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32943144" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" weight="0.32850242" />
       <window_info anchor="bottom" id="Terminal" order="10" />
@@ -198,6 +203,36 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="problema de descifrado solucionado." />
+    <option name="LAST_COMMIT_MESSAGE" value="problema de descifrado solucionado." />
+  </component>
   <component name="debuggerHistoryManager">
     <expressions id="setValue">
       <expression>
@@ -232,8 +267,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/TBCA.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
-          <caret line="313" column="28" selection-start-line="313" selection-start-column="28" selection-end-line="313" selection-end-column="28" />
+        <state relative-caret-position="520">
+          <caret line="321" selection-start-line="321" selection-end-line="321" />
           <folding>
             <element signature="e#55#68#0" expanded="true" />
             <element signature="e#116#280#1" />

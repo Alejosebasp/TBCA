@@ -126,13 +126,13 @@ class TBCA:
             lista.append(cadenaEnHexa[i:i+2])
         return lista
 
-    def cifrar(self, mensaje, clave, IV):
+    def cifrar(self, mensaje, clave):
 
         if (len(mensaje) == 0):
             return "0"
 
         #Se genera un hexadecimal de 4 Bytes random que será nuestro Vector de Inicialización
-        self.IV = IV
+        self.IV = '34455678'
 
         #Pasar el mensaje de texto claro a base64 y luego dividirlo en bloques de tamaño 4
         mensajeB64 = self.textToBase64(mensaje)
@@ -170,9 +170,6 @@ class TBCA:
                 self.bloques[i] = self.listaToString(msgShiftLeft)
                 xorV = self.calcularXOR(self.bloquesV[i], claveHexa)
                 self.bloquesV[i] = self.listaToString(xorV)
-                if (clave == self.claves[0]):
-                    xorV2 = self.calcularXOR(self.bloquesV[i], self.IV)
-                    self.bloquesV[i] = self.listaToString(xorV2)
 
 
 
@@ -263,7 +260,7 @@ class TBCA:
             listaAux.append(self.listaToString(lista))
         return listaAux
 
-    def descifrar(self, cipherTextInHexa, clave, IV):
+    def descifrar(self, cipherTextInHexa, clave):
 
         if(cipherTextInHexa == '0'):
             return 0
@@ -271,7 +268,7 @@ class TBCA:
         #Pasar el string a una lista de bytes hexadecimales y crear los bloques para descifrar
         self.bloquesCipherTextV = self.crearBloquesParaDescifrar(cipherTextInHexa)
         self.bloquesCipherText = self.crearBloquesParaDescifrar(cipherTextInHexa)
-        self.IV = IV
+        self.IV = "34652385"
 
         # Pasar la clave de texto claro a base64 y luego obtener 10 claves que se utilizarán en las 10 iteraciones
         claveB64 = self.textToBase64(clave)
@@ -285,9 +282,6 @@ class TBCA:
                 shiftBytesRight = self.correrByteDerecha(self.stringToList(self.bloquesCipherText[i]))
                 # Aplicar el XOR del cipher Text con la clave para
                 claveEnHexa = self.textToHex(clave)
-                if (clave == self.claves[0]):
-                    xorV2 = self.calcularXOR(self.IV, self.bloquesCipherTextV[i])
-                    self.bloquesCipherTextV[i] = self.listaToString(xorV2)
                 xorV = self.calcularXOR(claveEnHexa, self.bloquesCipherTextV[i])
                 self.bloquesCipherTextV[i] = self.listaToString(xorV)
                 xorShiftBytesRightAndKi = self.calcularXOR(shiftBytesRight, claveEnHexa)
@@ -313,18 +307,16 @@ tbca = TBCA()
 #Mensaje a cifrar
 mensaje = "mensaje de prueba"
 #Clave para cifrar el mensaje
-clave = "cláve 23484.,/8)(+"
-#Generar un Vector de Inicialización random, para aumentar la entropía (támbien se utiliza para descifrar)
-IV = tbca.generarIV()
+clave = "cláve 234sdfw4535"
 #tbca.generarIV()
 #Se llama a la función cifrar para poder cifrar el mensaje.
 # Se obtiene el cipher Text en hexadecimal (Habría que pasarlo a codigo ASCII)
-cipherText = tbca.cifrar(mensaje, clave, IV)
+cipherText = tbca.cifrar(mensaje, clave)
 #Se imprime el cipher Text
 print("Cifrado: ", cipherText)
 #Para descifrar, llamar a la función descifrar del objeto,
 #se debe pasar el cipher text como un string de hexadecimales.
 #Se obtiene el mensaje descifrado, en ASCII
-mensajedescifrado = tbca.descifrar(cipherText, clave, IV)
+mensajedescifrado = tbca.descifrar(cipherText, clave)
 #Se imprime el mendaje descifrado
 print("descifrado: ", mensajedescifrado)
