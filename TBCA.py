@@ -16,15 +16,14 @@ class TBCA:
     sizeClave = 4
 
     def __init__(self):
-        self.bloques = []
+        self.bloquesV = []
         self.claves = []
         self.cipherText = ""
-        self.bloquesCipherText = []
+        self.bloquesCipherTextV = []
         self.mensajeDescifrado = []
 
     def generarIV(self):
         IV_hex = secrets.token_hex(4)
-        print(IV_hex)
         return IV_hex
 
     def textToHex(self, mensaje):
@@ -39,9 +38,7 @@ class TBCA:
         return mensajeB64.decode("utf-8")
 
     def base64ToText(self, cadenaB64):
-        print("B64: ", cadenaB64)
         mensaje = str(base64.b64decode(cadenaB64))
-        print("Text: ", mensaje)
         return mensaje[2:len(mensaje)-1]
 
     def calcularXOR(self, stringHex1, stringHex2):
@@ -61,7 +58,7 @@ class TBCA:
 
         bloques = []
         for i in range(0, len(textoInB64), size):
-            bloques.append(textoInB64[i + 0] + textoInB64[i + 2] + textoInB64[i + 1] + textoInB64[i + 3])
+            bloques.append(textoInB64[i + 0]  + textoInB64[i + 2] + textoInB64[i + 1] + textoInB64[i + 3])
         return bloques
 
     def generarClaves(self, claveB64):
@@ -131,14 +128,16 @@ class TBCA:
 
     def cifrar(self, mensaje, clave, IV):
 
+        if (len(mensaje) == 0):
+            return "0"
 
         #Se genera un hexadecimal de 4 Bytes random que será nuestro Vector de Inicialización
         self.IV = IV
 
         #Pasar el mensaje de texto claro a base64 y luego dividirlo en bloques de tamaño 4
         mensajeB64 = self.textToBase64(mensaje)
+        self.bloquesV = self.crearBloquesParaCifrar(mensajeB64, self.sizeBloque)
         self.bloques = self.crearBloquesParaCifrar(mensajeB64, self.sizeBloque)
-
 
         #Pasar la clave de texto claro a base64 y luego obtener 10 claves que se utilizarán en las 10 iteraciones
         claveB64 = self.textToBase64(clave)
@@ -146,11 +145,12 @@ class TBCA:
 
         #Ciclo para realizar las 10 iteraciones con todos los bloques del mensaje
         for clave in self.claves:
-            for i in range (0, len(self.bloques), 1):
+            for i in range (0, len(self.bloquesV), 1):
 
                 # Pasar el bloque 1 del mensaje a hexadecimal
                 if  (clave == self.claves[0]):
-                    mensajeHex = self.textToHex(self.bloques[i])
+                    mensajeHex = self.textToHex(self.bloquesV[i])
+                    self.bloquesV[i] = mensajeHex
                     self.bloques[i] = mensajeHex
 
                 # Aplicar XOR con el el IV
@@ -168,9 +168,15 @@ class TBCA:
                 msgShiftLeft = self.correrByteIzquierda(xorMsgTransAndKi)
                 #Guardar el resultado en la lista de bloques
                 self.bloques[i] = self.listaToString(msgShiftLeft)
+                xorV = self.calcularXOR(self.bloquesV[i], claveHexa)
+                self.bloquesV[i] = self.listaToString(xorV)
+                if (clave == self.claves[0]):
+                    xorV2 = self.calcularXOR(self.bloquesV[i], self.IV)
+                    self.bloquesV[i] = self.listaToString(xorV2)
 
-        #self.bloques = self.hexToB64()
-        self.cipherText = self.listaToString(self.bloques)
+
+
+        self.cipherText = self.listaToString(self.bloquesV)
 
         return self.cipherText
 
@@ -258,7 +264,12 @@ class TBCA:
         return listaAux
 
     def descifrar(self, cipherTextInHexa, clave, IV):
+
+        if(cipherTextInHexa == '0'):
+            return 0
+
         #Pasar el string a una lista de bytes hexadecimales y crear los bloques para descifrar
+        self.bloquesCipherTextV = self.crearBloquesParaDescifrar(cipherTextInHexa)
         self.bloquesCipherText = self.crearBloquesParaDescifrar(cipherTextInHexa)
         self.IV = IV
 
@@ -268,13 +279,17 @@ class TBCA:
         self.claves.reverse()
 
         for clave in self.claves:
-            for i in range(len(self.bloquesCipherText)):
+            for i in range(len(self.bloquesCipherTextV)):
 
                 # Realizar la traslación de 1 byte hacia la derecha del cipherText
                 shiftBytesRight = self.correrByteDerecha(self.stringToList(self.bloquesCipherText[i]))
                 # Aplicar el XOR del cipher Text con la clave para
                 claveEnHexa = self.textToHex(clave)
-
+                if (clave == self.claves[0]):
+                    xorV2 = self.calcularXOR(self.IV, self.bloquesCipherTextV[i])
+                    self.bloquesCipherTextV[i] = self.listaToString(xorV2)
+                xorV = self.calcularXOR(claveEnHexa, self.bloquesCipherTextV[i])
+                self.bloquesCipherTextV[i] = self.listaToString(xorV)
                 xorShiftBytesRightAndKi = self.calcularXOR(shiftBytesRight, claveEnHexa)
 
                 # Aplicar la función inversa de TransponerByte
@@ -287,23 +302,21 @@ class TBCA:
 
                 self.bloquesCipherText[i] = self.listaToString(xorTextTranspuestoAndIV)
 
-        self.bloquesCipherText.reverse()
-
-        self.bloquesCipherText = self.ultimaTranslacion(self.bloquesCipherText)
-
-        return self.base64ToText(self.hexToText(self.listaToString(self.bloquesCipherText)))
+        self.bloquesCipherTextV.reverse()
+        self.bloquesCipherTextV = self.ultimaTranslacion(self.bloquesCipherTextV)
+        return self.base64ToText(self.hexToText(self.listaToString(self.bloquesCipherTextV)))
 
 
 '''Ejemplo de uso'''
 #Instanciar el objeto para poder cifrar el mensaje
 tbca = TBCA()
 #Mensaje a cifrar
-mensaje = "hola"
+mensaje = "mensaje de prueba"
 #Clave para cifrar el mensaje
-clave = "clave1234"
+clave = "cláve 23484.,/8)(+"
 #Generar un Vector de Inicialización random, para aumentar la entropía (támbien se utiliza para descifrar)
-#IV = tbca.generarIV()
 IV = tbca.generarIV()
+#tbca.generarIV()
 #Se llama a la función cifrar para poder cifrar el mensaje.
 # Se obtiene el cipher Text en hexadecimal (Habría que pasarlo a codigo ASCII)
 cipherText = tbca.cifrar(mensaje, clave, IV)
@@ -315,11 +328,3 @@ print("Cifrado: ", cipherText)
 mensajedescifrado = tbca.descifrar(cipherText, clave, IV)
 #Se imprime el mendaje descifrado
 print("descifrado: ", mensajedescifrado)
-
-'''Valores del IV que cambian el resultado:
-446cabef
-21bff28d
-7fea2bc5
-fda55311
-04bd90b3
-'''
